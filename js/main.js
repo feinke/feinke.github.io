@@ -1,8 +1,19 @@
 var Preload = (function(){
+	var tl = new TimelineMax({ repeat: -1 });
+
 	return {
 		init: function(){
+			Preload.stop();
 			Events.create();
 			theFAnim.init();
+		},
+		play : function(){
+			tl.add(TweenMax.staggerFrom($("#loading span"), 1, { autoAlpha: "0.2", ease: Sine.easeIn }, 0.2));
+			tl.add(TweenMax.staggerTo($("#loading span"), 1, { autoAlpha: "0.2", ease: Sine.easeIn }, 0.2), "-=0.2");
+		},
+		stop: function(){
+			tl.stop();
+			TweenMax.staggerTo($("#loading span"), 0.5, { autoAlpha: "0", ease: Sine.easeIn }, 0.2);
 		}
 	}
 })();
@@ -24,12 +35,15 @@ var Overlay = (function() {
 		{ left: '100%', ease: Expo.easeOut }
 	];
 
+	var prevTransition = { top:"-100%", left: "0%"};
+
 	return {
 		open: function(overlayID) {
-			TweenMax.to($(overlayID), 1, { top: 0, left:0, ease: Expo.easeIn});
+			TweenMax.fromTo($(overlayID), 1, prevTransition, { top: "0%", left:"0%", ease: Expo.easeIn});
 		},
 		close: function (overlayID){
 			var tweenObj = Utils.getRandom(exitTransitionList);
+			prevTransition = tweenObj;
 			TweenMax.to($(overlayID), 1, tweenObj);
 		}
 	}
@@ -91,5 +105,6 @@ var Label = (function(){
 
 
 (function($, TweenMax){
+	Preload.play();
 	$(window).on('load', Preload.init);
 })(jQuery, TweenMax);
